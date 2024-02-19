@@ -17,6 +17,8 @@ import json
 import os
 import time
 from otii_tcp_client import otii_connection, otii as otii_application
+from otii_tcp_client.arc import Channel
+
 
 # The default hostname and port of the Otii 3 application
 HOSTNAME = '127.0.0.1'
@@ -69,8 +71,8 @@ def sync_with_log():
     device.enable_exp_port(True)
 
     # Enable the main current and rx channel
-    device.enable_channel('mc', True)
-    device.enable_channel('rx', True)
+    device.enable_channel(Channel.MAIN_CURRENT, True)
+    device.enable_channel(Channel.RX, True)
 
     # Get the active project
     project = otii.get_active_project()

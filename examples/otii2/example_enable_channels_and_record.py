@@ -4,6 +4,7 @@ import sys, os
 sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(__file__), '..')))
 
 from otii_tcp_client import otii_connection, otii_exception, otii
+from otii_tcp_client.arc import Channel
 import example_config as cfg
 
 def check_create_project(otii_object):
@@ -17,9 +18,9 @@ def check_create_project(otii_object):
 
 def enable_channels_record(otii_object, proj, my_arc):
     print(my_arc.name + " supply voltage: " + str(my_arc.get_main_voltage()))
-    my_arc.enable_channel("mc", True)
+    my_arc.enable_channel(Channel.MAIN_CURRENT, True)
     print(my_arc.name + " enabled channel Main Current")
-    my_arc.enable_channel("mv", True)
+    my_arc.enable_channel(Channel.MAIN_VOLTAGE, True)
     print(my_arc.name + " enabled channel Main Voltage")
     otii_object.set_all_main(True)
     print("Set all supply: on")
@@ -33,7 +34,7 @@ def enable_channels_record(otii_object, proj, my_arc):
     time.sleep(4)
     proj.stop_recording()
     print("Stopped recording with id: " + str(proj.get_last_recording().id))
-    my_arc.enable_channel("mv", False)
+    my_arc.enable_channel(Channel.MAIN_VOLTAGE, False)
     print(my_arc.name + " disabled channel Main Voltage")
     proj.start_recording()
     print("New recording started with id: " + str(proj.get_last_recording().id))

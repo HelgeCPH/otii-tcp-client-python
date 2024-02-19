@@ -9,6 +9,8 @@ import time
 sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(__file__), '..')))
 
 from otii_tcp_client import otii_connection, otii_exception, otii
+from otii_tcp_client.arc import Channel
+
 import example_config as cfg
 
 def check_create_project(otii_object):
@@ -22,9 +24,9 @@ def check_create_project(otii_object):
 
 def setup_channels(otii_object, proj, my_arc):
     print(my_arc.name + " supply voltage: " + str(my_arc.get_main_voltage()))
-    my_arc.enable_channel("mc", True)
+    my_arc.enable_channel(Channel.MAIN_CURRENT, True)
     print(my_arc.name + " enabled channel Main Current")
-    my_arc.enable_channel("mv", True)
+    my_arc.enable_channel(Channel.MAIN_VOLTAGE, True)
     print(my_arc.name + " enabled channel Main Voltage")
 
     my_arc.set_power_regulation("current")

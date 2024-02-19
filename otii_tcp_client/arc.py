@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 #coding: utf-8
-
+from enum import Enum
 from otii_tcp_client import otii_connection, otii_exception
+
+
 
 class Arc:
     """ Class to define an Arc device.
@@ -66,11 +68,11 @@ class Arc:
         """ Enable or disable measurement channel.
 
         Args:
-            channel (str): Name of the channel to enable or disable.
+            channel (:obj:Channel): Name of the channel to enable or disable.
             enable (bool): True to enable channel, False to disable.
 
         """
-        data = {"device_id": self.id, "channel": channel, "enable": enable}
+        data = {"device_id": self.id, "channel": channel.value, "enable": enable}
         request = {"type": "request", "cmd": "arc_enable_channel", "data": data}
         response = self.connection.send_and_receive(request)
         if response["type"] == "error":
@@ -134,13 +136,13 @@ class Arc:
         """ Get channel sample rate.
 
         Args:
-            channel (str): Name of the channel to get the sample rate for.
+            channel (:obj:Channel): Name of the channel to get the sample rate for.
 
         Returns:
             int: Sample rate for channel
 
         """
-        data = {"device_id": self.id, "channel": channel}
+        data = {"device_id": self.id, "channel": channel.value}
         request = {"type": "request", "cmd": "arc_get_channel_samplerate", "data": data}
         response = self.connection.send_and_receive(request)
         if response["type"] == "error":
@@ -362,16 +364,16 @@ class Arc:
 
     def get_value(self, channel):
         """ Get value from specified channel.
-        This is not available for the rx channel.
+        This is not available for the UART_LOGS (rx) channel.
 
         Args:
-            channel (str): Name of the channel to get value from.
+            channel (:obj:Channel): Name of the channel to get value from.
 
         Returns:
             float: Present value in the channel (A/V/°C/Digital).
 
         """
-        data = {"device_id": self.id, "channel": channel}
+        data = {"device_id": self.id, "channel": channel.value}
         request = {"type": "request", "cmd": "arc_get_value", "data": data}
         response = self.connection.send_and_receive(request)
         if response["type"] == "error":
@@ -449,11 +451,11 @@ class Arc:
         """ Set the sample rate of a channel
 
         Args:
-            channel (str): Name of the channel to set the sample rate for.
+            channel (:obj:Channel): Name of the channel to set the sample rate for.
             value (int): The sample rate to set
 
         """
-        data = {"device_id": self.id, "channel": channel, "value": value}
+        data = {"device_id": self.id, "channel": channel, "value": value.value}
         request = {"type": "request", "cmd": "arc_set_channel_samplerate", "data": data}
         response = self.connection.send_and_receive(request)
         if response["type"] == "error":
@@ -709,3 +711,26 @@ class Arc:
         response = self.connection.send_and_receive(request, 15)
         if response["type"] == "error":
             raise otii_exception.Otii_Exception(response)
+
+
+class Channel(Enum):
+    """ All channels of an ARC device and their mapping to strings that are
+    understood by the TCP server.
+
+    Use these values as input to the `Arc.enable_channel` method or for the
+    `get_*` methods of the ``Recording` class.
+    """
+    # Identifier   String value   Unit
+    MAIN_CURRENT = "mc"         # A
+    MAIN_VOLTAGE = "mv"         # V
+    MAIN_ENERGY = "me"          # J
+    ADC_CURRENT = "ac"          # A
+    ADC_VOLTAGE = "av"          # V
+    ADC_ENERGY = "ae"           # J
+    SENSE_MINUS_VOLTAGE = "sn"  # V
+    SENSE_PLUS_VOLTAGE = "sp"   # V
+    VBUS = "vb"                 # V
+    TEMPERATURE = "tp"          # °C
+    UART_LOGS = "rx"            # text
+    GPI_1 = "i1"
+    GPI_2 = "i2"

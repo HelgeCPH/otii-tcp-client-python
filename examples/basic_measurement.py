@@ -17,6 +17,8 @@ import json
 import os
 import time
 from otii_tcp_client import otii_connection, otii as otii_application
+from otii_tcp_client.arc import Channel
+
 
 # The default hostname and port of the Otii 3 application
 HOSTNAME = '127.0.0.1'
@@ -57,7 +59,7 @@ def basic_measurement():
     device.set_max_current(0.5)
 
     # Enable the main current channel
-    device.enable_channel('mc', True)
+    device.enable_channel(Channel.MAIN_CURRENT, True)
 
     # Get the active project
     project = otii.get_active_project()
