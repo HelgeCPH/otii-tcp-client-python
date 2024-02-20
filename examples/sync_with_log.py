@@ -72,7 +72,7 @@ def sync_with_log():
 
     # Enable the main current and rx channel
     device.enable_channel(Channel.MAIN_CURRENT, True)
-    device.enable_channel(Channel.RX, True)
+    device.enable_channel(Channel.UART_LOGS, True)
 
     # Get the active project
     project = otii.get_active_project()
@@ -94,8 +94,8 @@ def sync_with_log():
 
     # Find at least two log messages
     recording = project.get_last_recording()
-    count = recording.get_channel_data_count(device.id, 'rx')
-    data = recording.get_channel_data(device.id, 'rx', 0, count)
+    count = recording.get_channel_data_count(device.id, Channel.UART_LOGS)
+    data = recording.get_channel_data(device.id, Channel.UART_LOGS, 0, count)
     values = data['values']
     timestamps = [
         value['timestamp'] for value in values
@@ -107,8 +107,8 @@ def sync_with_log():
     to_time = timestamps[1]
 
     # Get statistics for the time between the two log entries
-    info = recording.get_channel_info(device.id, 'mc')
-    statistics = recording.get_channel_statistics(device.id, 'mc', from_time, to_time)
+    info = recording.get_channel_info(device.id, Channel.MAIN_CURRENT)
+    statistics = recording.get_channel_statistics(device.id, Channel.MAIN_CURRENT, from_time, to_time)
 
     # Print the statistics
     print(f'From:        {from_time} s')

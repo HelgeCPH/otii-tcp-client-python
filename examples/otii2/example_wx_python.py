@@ -37,7 +37,7 @@ class MainWindow(wx.Frame):
 
     def update(self, event):
         if self.active_device:
-            voltage = self.active_device.get_value("mv")
+            voltage = self.active_device.get_value(Channel.MAIN_VOLTAGE)
             print("Voltage: {0}".format(voltage))
 
     def add_devices(self, devices):

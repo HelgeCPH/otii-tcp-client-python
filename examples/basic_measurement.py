@@ -81,8 +81,8 @@ def basic_measurement():
 
     # Get statistics for the recording
     recording = project.get_last_recording()
-    info = recording.get_channel_info(device.id, 'mc')
-    statistics = recording.get_channel_statistics(device.id, 'mc', info['from'], info['to'])
+    info = recording.get_channel_info(device.id, Channel.MAIN_CURRENT)
+    statistics = recording.get_channel_statistics(device.id, Channel.MAIN_CURRENT, info['from'], info['to'])
 
     # Print the statistics
     print(f'From:        {info["from"]} s')

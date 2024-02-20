@@ -95,8 +95,8 @@ def compare_with_saved():
     print_header()
     recordings = project.get_recordings()
     for recording in recordings[-2:]:
-        info = recording.get_channel_info(device.id, 'mc')
-        statistics = recording.get_channel_statistics(device.id, 'mc', info['from'], info['to'])
+        info = recording.get_channel_info(device.id, Channel.MAIN_CURRENT)
+        statistics = recording.get_channel_statistics(device.id, Channel.MAIN_CURRENT, info['from'], info['to'])
         print_statistics(recording, info, statistics)
 
     # Only keep the last recordings in the project defined by MAX_NO_OF_RECORDINGS

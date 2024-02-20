@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 import unicodedata
-from otii_tcp_client import otii_connection, otii_exception
 from dateutil.parser import isoparse
+from otii_tcp_client import otii_connection, otii_exception
+from otii_tcp_client.arc import Channel
+
 
 CHUNK_SIZE = 40000
 
+
 def remove_control_characters(s):
     return "".join(ch for ch in s if unicodedata.category(ch)[0] != "C")
+
 
 class Recording:
     """ Class to define an Otii Recording object.
@@ -47,11 +51,11 @@ class Recording:
 
         Args:
             device_id (str): ID of device capturing the data.
-            channel (str): Name of the channel to downsample.
+            channel (:obj:Channel): Name of the channel to downsample.
             factor (int): Factor to downsample with.
 
         """
-        data = {"recording_id": self.id, "device_id": device_id, "channel": channel, "factor": factor}
+        data = {"recording_id": self.id, "device_id": device_id, "channel": channel.value, "factor": factor}
         request = {"type": "request", "cmd": "recording_downsample_channel", "data": data}
         # Set timeout to None (blocking) as command can operate over large quantities of data to avoid timeout
         response = self.connection.send_and_receive(request, None)
@@ -63,13 +67,13 @@ class Recording:
 
         Args:
             device_id (str): ID of device to get data from.
-            channel (str): Name of the channel to get data from.
+            channel (:obj:Channel): Name of the channel to get data from.
 
         Returns:
             int: Number of data entries in the channel.
 
         """
-        data = {"recording_id": self.id, "device_id": device_id, "channel": channel}
+        data = {"recording_id": self.id, "device_id": device_id, "channel": channel.value}
         request = {"type": "request", "cmd": "recording_get_channel_data_count", "data": data}
         response = self.connection.send_and_receive(request)
         if response["type"] == "error":
@@ -81,14 +85,14 @@ class Recording:
 
         Args:
             device_id (str): ID of device to get data from.
-            channel (str): Name of the channel to get data from.
+            channel (:obj:Channel): Name of the channel to get data from.
             timestamp (float): Timestamp to get index of in seconds (s).
 
         Returns:
             int: Index of data entry at the timestamp.
 
         """
-        data = {"device_id": device_id, "recording_id": self.id, "channel": channel, "timestamp": timestamp}
+        data = {"device_id": device_id, "recording_id": self.id, "channel": channel.value, "timestamp": timestamp}
         request = {"type": "request", "cmd": "recording_get_channel_data_index", "data": data}
         response = self.connection.send_and_receive(request)
         if response["type"] == "error":
@@ -100,7 +104,7 @@ class Recording:
 
         Args:
             device_id (str): ID of device to get data from.
-            channel (str): Name of the channel to get data from.
+            channel (:obj:Channel): Name of the channel to get data from.
             index (int): Start position for fetching data, first value at index 0.
             count (int): Number of data entries to fetch.
             strip (bool): Strip control data from log channel, defaults to True.
@@ -109,21 +113,21 @@ class Recording:
             :obj:data:
 
         """
-        if channel == "rx" or channel == "i1" or channel == "i2":
-            request_data = {"device_id": device_id, "recording_id": self.id, "channel": channel, "index": index, "count":count}
+        if channel == Channel.UART_LOGS or channel == Channel.GPI_1 or channel == Channel.GPI_2:
+            request_data = {"device_id": device_id, "recording_id": self.id, "channel": channel.value, "index": index, "count":count}
             request = {"type": "request", "cmd": "recording_get_channel_data", "data": request_data}
             response = self.connection.send_and_receive(request, None)
             if response["type"] == "error":
                 raise otii_exception.Otii_Exception(response)
             data = response["data"]
-            if channel == "rx" and strip:
+            if channel == Channel.UART_LOGS and strip:
                 data["values"] = [
                     {"value": remove_control_characters(value["value"]), "timestamp": value["timestamp"]}
                     for value in data["values"]
                 ]
             return data
         else:
-            request_data = {"device_id": device_id, "recording_id": self.id, "channel": channel}
+            request_data = {"device_id": device_id, "recording_id": self.id, "channel": channel.value}
             request = {"type": "request", "cmd": "recording_get_channel_data", "data": request_data}
             data = None
             while count > 0:
@@ -146,13 +150,13 @@ class Recording:
 
         Args:
             device_id (str): ID of device to get info from.
-            channel (str): Name of the channel to get info from.
+            channel (:obj:Channel): Name of the channel to get info from.
 
         Returns:
             :obj:data: Info
 
         """
-        data = {"recording_id": self.id, "device_id": device_id, "channel": channel}
+        data = {"recording_id": self.id, "device_id": device_id, "channel": channel.value}
         request = {"type": "request", "cmd": "recording_get_channel_info", "data": data}
         response = self.connection.send_and_receive(request)
         if response["type"] == "error":
@@ -164,7 +168,7 @@ class Recording:
 
         Args:
             device_id (str): ID of device to get data from.
-            channel (str): Name of the channel to get data from.
+            channel (:obj:Channel): Name of the channel to get data from.
             start (float): Selection start in seconds.
             end (float): Selection end in seconds.
 
@@ -172,7 +176,7 @@ class Recording:
             :obj:data: Statistics
 
         """
-        data = {"recording_id": self.id, "device_id": device_id, "channel": channel, "from": from_time, "to": to_time}
+        data = {"recording_id": self.id, "device_id": device_id, "channel": channel.value, "from": from_time, "to": to_time}
         request = {"type": "request", "cmd": "recording_get_channel_statistics", "data": data}
         response = self.connection.send_and_receive(request)
         if response["type"] == "error":
@@ -184,13 +188,13 @@ class Recording:
 
         Args:
             device_id (str): ID of the capturing device. Set to None for imported logs.
-            channel (str): The channel name. For imported logs, set to log_id returned by import_log.
+            channel (:obj:Channel): The channel name. For imported logs, set to log_id returned by import_log.
 
         Returns:
             int: The offset of the log
 
         """
-        data = {"recording_id": self.id, "channel": channel}
+        data = {"recording_id": self.id, "channel": channel.value}
         if (device_id != None):
             data["device_id"] = device_id
         request = {"type": "request", "cmd": "recording_get_log_offset", "data": data}
@@ -282,11 +286,11 @@ class Recording:
 
         Args:
             device_id (str): ID of the capturing device. Set to None for imported logs.
-            channel (str): The channel name. For imported logs, set to log_id returned by import_log.
+            channel (:obj:Channel): The channel name. For imported logs, set to log_id returned by import_log.
             offset (int): The new offset to apply in microseconds.
 
         """
-        data = {"recording_id": self.id, "channel": channel, "offset": offset}
+        data = {"recording_id": self.id, "channel": channel.value, "offset": offset}
         if (device_id != None):
             data["device_id"] = device_id
         request = {"type": "request", "cmd": "recording_set_log_offset", "data": data}
