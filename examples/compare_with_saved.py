@@ -71,7 +71,7 @@ def compare_with_saved():
     device.set_max_current(0.5)
 
     # Enable the main current channel
-    device.enable_channel(Channel.MAIN_CURRENT, True)
+    device.enable_channel(Channel.MAIN_CURRENT)
 
     # Get the active project
     project = otii.get_active_project()
@@ -80,13 +80,13 @@ def compare_with_saved():
     project.start_recording()
 
     # Turn on the main output of the selected device
-    device.set_main(True)
+    device.enable_main()
 
     # Wait for a specified time
     time.sleep(MEASUREMENT_DURATION)
 
     # Turn off the main output of the selected device
-    device.set_main(False)
+    device.disable_main()
 
     # Stop the recording
     project.stop_recording()

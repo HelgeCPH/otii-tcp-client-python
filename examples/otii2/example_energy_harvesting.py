@@ -24,9 +24,9 @@ def check_create_project(otii_object):
 
 def setup_channels(otii_object, proj, my_arc):
     print(my_arc.name + " supply voltage: " + str(my_arc.get_main_voltage()))
-    my_arc.enable_channel(Channel.MAIN_CURRENT, True)
+    my_arc.enable_channel(Channel.MAIN_CURRENT)
     print(my_arc.name + " enabled channel Main Current")
-    my_arc.enable_channel(Channel.MAIN_VOLTAGE, True)
+    my_arc.enable_channel(Channel.MAIN_VOLTAGE)
     print(my_arc.name + " enabled channel Main Voltage")
 
     my_arc.set_power_regulation("current")

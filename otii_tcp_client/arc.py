@@ -2,7 +2,7 @@
 #coding: utf-8
 from enum import Enum
 from otii_tcp_client import otii_connection, otii_exception
-
+from otii_tcp_client.toggle import Toggle
 
 
 class Arc:
@@ -38,71 +38,125 @@ class Arc:
         if response["type"] == "error":
             raise otii_exception.Otii_Exception(response)
 
-    def enable_5v(self, enable):
+    def toggle_5v(self, toggle):
         """ Enable or disable 5V pin.
 
         Args:
-            enable (bool): True to enable 5V, False to disable.
+            toggle (:obj:Toggle): Toggle.ON to enable 5V, Toggle.OFF to disable.
 
         """
-        data = {"device_id": self.id, "enable": enable}
+        data = {"device_id": self.id, "enable": toggle.value}
         request = {"type": "request", "cmd": "arc_enable_5v", "data": data}
         response = self.connection.send_and_receive(request)
         if response["type"] == "error":
             raise otii_exception.Otii_Exception(response)
 
-    def enable_battery_profiling(self, enable):
-        """ This will start the discharge profiling of a connected battery.
+    def enable_5v(self):
+        """ Enable 5V pin.
+        """
+        self.toggle_5v(Toggle.ON)
+
+    def disable_5v(self):
+        """ Disable 5V pin.
+        """
+        self.toggle_5v(Toggle.OFF)
+
+    def toggle_battery_profiling(self, toggle):
+        """ This starts or stops the discharge profiling of a connected battery.
 
         Args:
-            enable (bool): True to start battery profiling, False to stop.
-
+            toggle (:obj:Toggle): Toggle.ON to start battery profiling, Toggle.OFF to stop.
         """
-        data = {"device_id": self.id, "enable": enable}
+        data = {"device_id": self.id, "enable": toggle.value}
         request = {"type": "request", "cmd": "arc_enable_battery_profiling", "data": data}
         response = self.connection.send_and_receive(request)
         if response["type"] == "error":
             raise otii_exception.Otii_Exception(response)
 
-    def enable_channel(self, channel, enable):
+    def enable_battery_profiling(self):
+        """ This starts the discharge profiling of a connected battery.
+        """
+        self.toggle_battery_profiling(Toggle.ON)
+
+    def disable_battery_profiling(self):
+        """ This will stop the discharge profiling of a connected battery.
+        """
+        self.toggle_battery_profiling(Toggle.OFF)
+
+    def toggle_channel(self, channel, toggle):
         """ Enable or disable measurement channel.
 
         Args:
             channel (:obj:Channel): Name of the channel to enable or disable.
-            enable (bool): True to enable channel, False to disable.
+            toggle (:obj:Toggle): True to enable channel, False to disable.
 
         """
-        data = {"device_id": self.id, "channel": channel.value, "enable": enable}
+        data = {"device_id": self.id, "channel": channel.value, "enable": toggle.value}
         request = {"type": "request", "cmd": "arc_enable_channel", "data": data}
         response = self.connection.send_and_receive(request)
         if response["type"] == "error":
             raise otii_exception.Otii_Exception(response)
 
-    def enable_exp_port(self, enable):
-        """ Enable expansion port.
+    def enable_channel(self, channel):
+        """ Enable a measurement channel.
 
         Args:
-            enable (bool): True to enable expansion port, False to disable.
+            channel (:obj:Channel): Name of the channel to enable.
+        """
+        self.toggle_channel(channel, Toggle.ON)
+
+    def disable_channel(self, channel):
+        """ Enable a measurement channel.
+
+        Args:
+            channel (:obj:Channel): Name of the channel to disable.
+        """
+        self.toggle_channel(channel, Toggle.OFF)
+
+    def toggle_exp_port(self, toggle):
+        """ Enable or disable expansion port.
+
+        Args:
+            toggle (:obj:Toggle): Toggle.ON to enable expansion port, Toggle.OFF to disable.
 
         """
-        data = {"device_id": self.id, "enable": enable}
+        data = {"device_id": self.id, "enable": toggle.value}
         request = {"type": "request", "cmd": "arc_enable_exp_port", "data": data}
         response = self.connection.send_and_receive(request)
         if response["type"] == "error":
             raise otii_exception.Otii_Exception(response)
 
-    def enable_uart(self, enable):
-        """ Enable UART.
+    def enable_exp_port(self):
+        """ Enable expansion port.
+        """
+        self.toggle_exp_port(Toggle.ON)
+
+    def disable_exp_port(self):
+        """ Disable expansion port.
+        """
+        self.toggle_exp_port(Toggle.OFF)
+
+    def toggle_uart(self, toggle):
+        """ Enable or disable UART.
 
         Args:
-            enable (bool): True to enable UART, False to disable.
-
+            toggle (:obj:Toggle): Toggle.ON to enable UART, Toggle.OFF to disable.
         """
-        data = {"device_id": self.id, "enable": enable}
+        data = {"device_id": self.id, "enable": toggle.value}
         request = {"type": "request", "cmd": "arc_enable_uart", "data": data}
         response = self.connection.send_and_receive(request)
         if response["type"] == "error":
             raise otii_exception.Otii_Exception(response)
+
+    def enable_uart(self):
+        """ Enable UART.
+        """
+        self.toggle_uart(Toggle.ON)
+
+    def disable_uart(self):
+        """ Disable UART.
+        """
+        self.toggle_uart(Toggle.OFF)
 
     def get_4wire(self):
         """ Get the 4-wire measurement state.
@@ -408,18 +462,28 @@ class Arc:
             raise otii_exception.Otii_Exception(response)
         return response["data"]["connected"]
 
-    def set_4wire(self, enable):
-        """ Enable/disable 4-wire measurements using Sense+/-.
+    def toggle_4wire(self, toggle):
+        """ Enable or disable 4-wire measurements using Sense+/-.
 
         Args:
-            enable (bool): True to enable 4-wire, false to disable
+            toggle (:obj:Toggle): Toggle.ON to enable 4-wire, Toggle.OFF to disable
 
         """
-        data = {"device_id": self.id, "enable": enable}
+        data = {"device_id": self.id, "enable": toggle.value}
         request = {"type": "request", "cmd": "arc_set_4wire", "data": data}
         response = self.connection.send_and_receive(request)
         if response["type"] == "error":
             raise otii_exception.Otii_Exception(response)
+
+    def enable_4wire(self):
+        """ Enable 4-wire measurements using Sense+/-.
+        """
+        self.toggle_4wire(Toggle.ON)
+
+    def disable_4wire(self):
+        """ Disable 4-wire measurements using Sense+/-.
+        """
+        self.toggle_4wire(Toggle.OFF)
 
     def set_adc_resistor(self, value):
         """ Set the value of the shunt resistor for the ADC.
@@ -474,32 +538,58 @@ class Arc:
         if response["type"] == "error":
             raise otii_exception.Otii_Exception(response)
 
-    def set_gpo(self, pin, value):
+    def toggle_gpo(self, pin, toggle):
         """ Set the state of one of the GPO pins.
 
         Args:
             pin (int): ID of the GPO pin to set state of, 1 or 2.
-            value (bool): True to enable GPO output, False to disable.
+            toggle (:obj:Toggle): Toggle.ON to enable GPO output, Toggle.OFF to disable.
 
         """
-        data = {"device_id": self.id, "pin": pin, "value": value}
+        data = {"device_id": self.id, "pin": pin, "value": toggle.value}
         request = {"type": "request", "cmd": "arc_set_gpo", "data": data}
         response = self.connection.send_and_receive(request)
         if response["type"] == "error":
             raise otii_exception.Otii_Exception(response)
 
-    def set_main(self, enable):
+    def enable_gpo(self, pin):
+        """ Enable one of the GPO pins.
+
+        Args:
+            pin (int): ID of the GPO pin to enable, 1 or 2.
+        """
+        self.toggle_gpo(pin, Toggle.ON)
+
+    def disable_gpo(self, pin):
+        """ Disable one of the GPO pins.
+
+        Args:
+            pin (int): ID of the GPO pin to disnable, 1 or 2.
+        """
+        self.toggle_gpo(pin, Toggle.OFF)
+
+    def toggle_main(self, toggle):
         """ Turn on or off main power on a device.
 
         Args:
-            enable (bool): True to turn on main power, False to turn off.
+            toggle (:obj:Toggle): Toggle.ON to turn on main power, Toggle.OFF to turn off.
 
         """
-        data = {"device_id": self.id, "enable": enable}
+        data = {"device_id": self.id, "enable": toggle.value}
         request = {"type": "request", "cmd": "arc_set_main", "data": data}
         response = self.connection.send_and_receive(request)
         if response["type"] == "error":
             raise otii_exception.Otii_Exception(response)
+
+    def enable_main(self):
+        """ Turn on main power on a device.
+        """
+        self.toggle_main(Toggle.ON)
+
+    def disable_main(self):
+        """ Turn off main power on a device.
+        """
+        self.toggle_main(Toggle.OFF)
 
     def set_main_current(self, value):
         """ Set the main current on Arc. Used when the Otii device is set in constant current mode.
@@ -566,18 +656,28 @@ class Arc:
         if response["type"] == "error":
             raise otii_exception.Otii_Exception(response)
 
-    def set_src_cur_limit_enabled(self, enable):
+    def toggle_src_cur_limit(self, toggle):
         """ Enable voltage source current limit (CC) operation.
 
         Args:
-            enable (bool): True means enable constant current, false means cut-off.
+            toggle (:obj:Toggle): Toggle.ON means enable constant current, Toggle.OFF means cut-off.
 
         """
-        data = {"device_id": self.id, "enable": enable}
+        data = {"device_id": self.id, "enable": toggle.value}
         request = {"type": "request", "cmd": "arc_set_src_cur_limit_enabled", "data": data}
         response = self.connection.send_and_receive(request)
         if response["type"] == "error":
             raise otii_exception.Otii_Exception(response)
+
+    def enable_toggle_src_cur_limit(self):
+        """ Enable voltage source current limit (CC) operation.
+        """
+        self.toggle_src_cur_limit(Toggle.ON)
+
+    def disable_toggle_src_cur_limit(self):
+        """ Disable voltage source current limit (CC) operation.
+        """
+        self.toggle_src_cur_limit(Toggle.OFF)
 
     def set_supply(self, supply_id, series = 1, parallel = 1):
         """ Set power supply type.
@@ -594,18 +694,28 @@ class Arc:
         if response["type"] == "error":
             raise otii_exception.Otii_Exception(response)
 
-    def set_supply_soc_tracking(self, enable):
+    def toggle_supply_soc_tracking(self, toggle):
         """ Set power supply State of Charge tracking.
 
         Args:
-            enable (bool): True to enable State of Charge tracking, False to disable.
+            toggle (:obj:Toggle): Toggle.ON to enable State of Charge tracking, Toggle.OFF to disable.
 
         """
-        data = {"device_id": self.id, "enable": enable}
+        data = {"device_id": self.id, "enable": toggle.value}
         request = {"type": "request", "cmd": "arc_set_supply_soc_tracking", "data": data}
         response = self.connection.send_and_receive(request)
         if response["type"] == "error":
             raise otii_exception.Otii_Exception(response)
+
+    def enable_supply_soc_tracking(self):
+        """ Enable power supply State of Charge tracking.
+        """
+        self.toggle_supply_soc_tracking(Toggle.ON)
+
+    def disable_supply_soc_tracking(self):
+        """ Disable power supply State of Charge tracking.
+        """
+        self.toggle_supply_soc_tracking(Toggle.OFF)
 
     def set_supply_used_capacity(self, value):
         """ Set power supply used capacity.
@@ -620,18 +730,28 @@ class Arc:
         if response["type"] == "error":
             raise otii_exception.Otii_Exception(response)
 
-    def set_tx(self, value):
+    def toggle_tx(self, toggle):
         """ The TX pin can be used as a GPO when the UART is disabled.
 
         Args:
-            value (bool): True to enable TX output, False to disable.
+            toggle (:objToggle:): Toggle.ON to enable TX output, Toggle.OFF to disable.
 
         """
-        data = {"device_id": self.id, "value": value}
+        data = {"device_id": self.id, "value": toggle.value}
         request = {"type": "request", "cmd": "arc_set_tx", "data": data}
         response = self.connection.send_and_receive(request)
         if response["type"] == "error":
             raise otii_exception.Otii_Exception(response)
+
+    def enable_tx(self):
+        """ The TX pin can be used as a GPO when the UART is disabled.
+        """
+        self.toggle_tx(Toggle.ON)
+
+    def disable_tx(self):
+        """ The TX pin can be used as a GPO when the UART is disabled.
+        """
+        self.toggle_tx(Toggle.OFF)
 
     def set_uart_baudrate(self, value):
         """ Set UART baud rate.

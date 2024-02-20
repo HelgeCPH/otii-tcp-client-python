@@ -67,12 +67,12 @@ def sync_with_log():
     device.set_exp_voltage(3.3)
     device.set_max_current(0.5)
     device.set_uart_baudrate(115200)
-    device.enable_uart(True)
-    device.enable_exp_port(True)
+    device.enable_uart()
+    device.enable_exp_port()
 
     # Enable the main current and rx channel
-    device.enable_channel(Channel.MAIN_CURRENT, True)
-    device.enable_channel(Channel.UART_LOGS, True)
+    device.enable_channel(Channel.MAIN_CURRENT)
+    device.enable_channel(Channel.UART_LOGS)
 
     # Get the active project
     project = otii.get_active_project()

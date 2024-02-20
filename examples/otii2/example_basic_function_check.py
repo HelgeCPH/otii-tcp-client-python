@@ -24,7 +24,7 @@ def basic_function_check(otii_object, my_arc):
     print("Calibration finished")
     time.sleep(1)
     print(my_arc.name + " turn supply: on")
-    my_arc.set_main(True)
+    my_arc.enable_main()
     time.sleep(4)
     print("Turn all supply: off")
     otii_object.set_all_main(False)

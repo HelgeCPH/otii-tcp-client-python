@@ -50,10 +50,10 @@ class MainWindow(wx.Frame):
             self.on_device_list_clicked(None)
 
     def on_turn_on_clicked(self, event):
-        self.active_device.set_main(True)
+        self.active_device.enable_main()
 
     def on_turn_off_clicked(self, event):
-        self.active_device.set_main(False)
+        self.active_device.disable_main()
 
     def on_device_list_clicked(self, event):
         self.active_device = self.devices[self.device_list.GetSelection()]
