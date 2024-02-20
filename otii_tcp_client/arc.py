@@ -723,10 +723,10 @@ class Channel(Enum):
     # Identifier   String value   Unit
     MAIN_CURRENT = "mc"         # A
     MAIN_VOLTAGE = "mv"         # V
-    MAIN_ENERGY = "me"          # J
+    MAIN_POWER = "mp"          # J
     ADC_CURRENT = "ac"          # A
     ADC_VOLTAGE = "av"          # V
-    ADC_ENERGY = "ae"           # J
+    ADC_POWER = "ap"           # J
     SENSE_MINUS_VOLTAGE = "sn"  # V
     SENSE_PLUS_VOLTAGE = "sp"   # V
     VBUS = "vb"                 # V
